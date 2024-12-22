@@ -1,4 +1,5 @@
 use std::io;
+use std::fs;
 use std::process::Command;
 
 fn main() {
@@ -50,7 +51,7 @@ fn main() {
     for disk in disks {
         let disk_clone = disk.clone();
         let output = Command::new("cmd")
-            .args(&["/C", &format!("WHERE /R {}:\\ WeChat.exe", disk_clone)])
+            .args(&["/C", &format!("WHERE /R {}\\ WeChat.exe", disk_clone)])
             .output()
             .expect("Failed to execute cmd command");
         let output_str = String::from_utf8_lossy(&output.stdout);
@@ -58,6 +59,20 @@ fn main() {
         if paths.len() > 0 {
             let path = paths.get(0).unwrap_or(&"").to_string();
             wechat_paths.push(path);
+            break;
+        }
+    }
+
+    if wechat_paths.is_empty() {
+        println!("未找到 WeChat.exe，请手动输入路径:");
+        let mut manual_path = String::new();
+        io::stdin().read_line(&mut manual_path).expect("读取输入失败");
+        let manual_path = manual_path.trim().to_string();
+        if fs::metadata(&manual_path).is_ok() {
+            wechat_paths.push(manual_path);
+        } else {
+            println!("输入的路径无效");
+            return;
         }
     }
 
