@@ -51,7 +51,7 @@ fn main() {
     for disk in disks {
         let disk_clone = disk.clone();
         let output = Command::new("cmd")
-            .args(&["/C", &format!("WHERE /R {}\\ WeChat.exe", disk_clone)])
+            .args(&["/C", &format!("WHERE /R {}:\\ WeChat.exe", disk_clone)])
             .output()
             .expect("Failed to execute cmd command");
         let output_str = String::from_utf8_lossy(&output.stdout);
@@ -77,4 +77,12 @@ fn main() {
     }
 
     println!("WeChat.exe 路径列表: {:?}", wechat_paths);
+
+    for _ in 0..stored_value {
+        if let Some(path) = wechat_paths.get(0) {
+            Command::new(path)
+                .spawn()
+                .expect("Failed to start WeChat.exe");
+        }
+    }
 }
